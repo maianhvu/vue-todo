@@ -21,6 +21,10 @@ const app = new Vue({
 
         markAsDone (todo) {
             todo.done = true
+        },
+
+        remove (index) {
+            this.todos.splice(index, 1)
         }
     }
 })

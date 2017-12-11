@@ -8,12 +8,14 @@
     <body>
         <div id="app">
             <h1>To-dos</h1>
+            <p v-if="todos.length === 0">There are no to-dos. Hurray!</p>
             <ul>
-                <li v-for="todo in sortedTodos">
+                <li v-for="(todo, index) in sortedTodos">
                     <span :class="{ done: todo.done }">
                         {{ todo.text }}
                     </span>
                     <button @click="markAsDone(todo)">done</button>
+                    <button @click="remove(index)">remove</button>
                 </li>
             </ul>
             <input type="text" placeholder="Add new todo…" v-model="pendingTodo">
