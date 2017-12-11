@@ -4,15 +4,15 @@
 }
 
 .priority-1 {
-    color: yellow;
+    color: #F3D600;
 }
 
 .priority-2 {
-    color: orange;
+    color: #FFAB49;
 }
 
 .priority-3 {
-    color: red;
+    color: #EB5A45;
 }
 
 .done {

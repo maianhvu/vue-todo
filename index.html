@@ -8,6 +8,15 @@
     <body>
         <div id="app">
             <h1>To-dos</h1>
+            <div>
+                <label>Sort:</label>
+                <select v-model="sortingOrder">
+                    <option selected value="SORT_INSERTION">insertion order</option>
+                    <option value="SORT_ALPHA">alphabetical</option>
+                    <option value="SORT_DEADLINE">deadline</option>
+                    <option value="SORT_PRIORITY">priority</option>
+                </select>
+            </div>
             <p v-if="todos.length === 0">There are no to-dos. Hurray!</p>
             <ul>
                 <li v-for="(todo, index) in sortedTodos">

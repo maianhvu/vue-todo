@@ -1,5 +1,10 @@
 const DateTime = luxon.DateTime
 
+const SORT_INSERTION = 'SORT_INSERTION'
+const SORT_ALPHA = 'SORT_ALPHA'
+const SORT_DEADLINE = 'SORT_DEADLINE'
+const SORT_PRIORITY = 'SORT_PRIORITY'
+
 const padWithZeroes = (number, length) => {
     let result = number.toString()
     if (result.length >= length) {
@@ -17,14 +22,37 @@ const app = new Vue({
     el: '#app',
     data: {
         todos: [],
+        sortingOrder: SORT_INSERTION,
         pendingTodo: '',
         pendingDeadline: '',
         pendingPriority: 0
     },
     computed: {
         sortedTodos () {
-            return this.todos.filter(t => !t.done)
+            let insertionOrder = this.todos.filter(t => !t.done)
                 .concat(this.todos.filter(t => t.done))
+            switch (this.sortingOrder) {
+                case SORT_ALPHA:
+                return insertionOrder.sort((a, b) => a.text.localeCompare(b.text))
+
+                case SORT_PRIORITY:
+                return insertionOrder.sort((a, b) => b.priority - a.priority)
+
+                case SORT_DEADLINE:
+                return insertionOrder.sort((a, b) => {
+                    // Both deadlines are not present => equal
+                    if (!a.hasOwnProperty('deadline') && !b.hasOwnProperty('deadline')) {
+                        return 0
+                    }
+                    if (!a.hasOwnProperty('deadline')) return 1 // a doesn't have a deadline, comes after
+                    if (!b.hasOwnProperty('deadline')) return -1 // b doesn't have a deadline, comes after
+                    // Otherwise, sort by their deadlines
+                    return a.deadline - b.deadline
+                })
+
+                default:
+                return insertionOrder
+            }
         }
     },
     methods: {
