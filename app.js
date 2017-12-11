@@ -22,12 +22,7 @@ const padWithZeroes = (number, length) => {
 const app = new Vue({
     el: '#app',
     data: {
-        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY) || "[]").map(todo => {
-            if (todo.hasOwnProperty('deadline')) {
-                todo.deadline = DateTime.fromISO(todo.deadline)
-            }
-            return todo
-        }),
+        todos: [],
         sortingOrder: SORT_INSERTION,
         pendingTodo: '',
         pendingDeadline: '',
@@ -99,12 +94,6 @@ const app = new Vue({
             return date.toLocaleString(DateTime.DATETIME_FULL)
         }
 
-    },
-
-    watch: {
-
-        todos (newTodos) {
-            localStorage.setItem(TODOS_LOCALSTORAGE_KEY, JSON.stringify(newTodos))
-        }
     }
+
 })
