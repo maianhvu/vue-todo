@@ -2,3 +2,8 @@
     color: #bbb;
     text-decoration: line-through;
 }
+
+.due-date {
+    color: #aaa;
+    font-style: oblique;
+}

@@ -14,14 +14,20 @@
                     <span :class="{ done: todo.done }">
                         {{ todo.text }}
                     </span>
+                    <span class="due-date" v-if="todo.deadline && !todo.done">
+                        due {{ formatDate(todo.deadline) }}
+                    </span>
                     <button @click="markAsDone(todo)">done</button>
                     <button @click="remove(index)">remove</button>
                 </li>
             </ul>
             <input type="text" placeholder="Add new todo…" v-model="pendingTodo">
+            <label>Deadline (optional):</label>
+            <input type="text" placeholder="hh:mm dd/mm/yyyy" v-model="pendingDeadline">
             <button @click.prevent="addTodo" :disabled="pendingTodo.trim().length === 0">Add</button>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="luxon.min.js"></script>
         <script src="app.js"></script>
     </body>
 </html>
