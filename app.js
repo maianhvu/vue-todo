@@ -4,6 +4,7 @@ const SORT_INSERTION = 'SORT_INSERTION'
 const SORT_ALPHA = 'SORT_ALPHA'
 const SORT_DEADLINE = 'SORT_DEADLINE'
 const SORT_PRIORITY = 'SORT_PRIORITY'
+const TODOS_LOCALSTORAGE_KEY = 'vueTodoApp-todos'
 
 const padWithZeroes = (number, length) => {
     let result = number.toString()
@@ -21,7 +22,12 @@ const padWithZeroes = (number, length) => {
 const app = new Vue({
     el: '#app',
     data: {
-        todos: [],
+        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY)).map(todo => {
+            if (todo.hasOwnProperty('deadline')) {
+                todo.deadline = DateTime.fromISO(todo.deadline)
+            }
+            return todo
+        }),
         sortingOrder: SORT_INSERTION,
         pendingTodo: '',
         pendingDeadline: '',
@@ -92,5 +98,12 @@ const app = new Vue({
             return date.toLocaleString(DateTime.DATETIME_FULL)
         }
 
+    },
+
+    watch: {
+
+        todos (newTodos) {
+            localStorage.setItem(TODOS_LOCALSTORAGE_KEY, JSON.stringify(newTodos))
+        }
     }
 })
