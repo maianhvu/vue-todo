@@ -3,15 +3,21 @@
     <head>
         <meta charset="utf-8">
         <title>To-do List</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <div id="app">
             <h1>To-dos</h1>
             <ul>
-                <li v-for="todo in todos">{{ todo }}</li>
+                <li v-for="todo in sortedTodos">
+                    <span :class="{ done: todo.done }">
+                        {{ todo.text }}
+                    </span>
+                    <button @click="markAsDone(todo)">done</button>
+                </li>
             </ul>
             <input type="text" placeholder="Add new todo…" v-model="pendingTodo">
-            <button @click.prevent="addTodo">Add</button>
+            <button @click.prevent="addTodo" :disabled="pendingTodo.trim().length === 0">Add</button>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script src="app.js"></script>

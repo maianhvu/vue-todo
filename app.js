@@ -4,10 +4,23 @@ const app = new Vue({
         todos: [],
         pendingTodo: ''
     },
+    computed: {
+        sortedTodos () {
+            return this.todos.filter(t => !t.done)
+                .concat(this.todos.filter(t => t.done))
+        }
+    },
     methods: {
         addTodo () {
-            this.todos.push(this.pendingTodo)
+            this.todos.push({
+                text: this.pendingTodo,
+                done: false
+            })
             this.pendingTodo = ''
+        },
+
+        markAsDone (todo) {
+            todo.done = true
         }
     }
 })
