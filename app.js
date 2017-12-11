@@ -6,6 +6,8 @@ const SORT_DEADLINE = 'SORT_DEADLINE'
 const SORT_PRIORITY = 'SORT_PRIORITY'
 const TODOS_LOCALSTORAGE_KEY = 'vueTodoApp-todos'
 
+const API_ENDPOINT = 'https://parrotodo.herokuapp.com'
+
 const padWithZeroes = (number, length) => {
     let result = number.toString()
     if (result.length >= length) {
@@ -94,6 +96,18 @@ const app = new Vue({
             return date.toLocaleString(DateTime.DATETIME_FULL)
         }
 
+    },
+
+    mounted () {
+        axios.get(API_ENDPOINT + '/todos').then(response => {
+            this.todos = response.data.map(todo => ({
+                text: todo.title,
+                priority: todo.priority,
+                deadline: todo.deadline ? DateTime.fromISO(todo.deadline) : undefined
+            }))
+        }).catch(err => {
+            console.error(err)
+        })
     }
 
 })
