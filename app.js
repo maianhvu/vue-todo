@@ -18,7 +18,8 @@ const app = new Vue({
     data: {
         todos: [],
         pendingTodo: '',
-        pendingDeadline: ''
+        pendingDeadline: '',
+        pendingPriority: 0
     },
     computed: {
         sortedTodos () {
@@ -30,7 +31,8 @@ const app = new Vue({
         addTodo () {
             let todo = {
                 text: this.pendingTodo,
-                done: false
+                done: false,
+                priority: this.pendingPriority
             }
 
             if (this.pendingDeadline.trim().length &&

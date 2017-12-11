@@ -11,7 +11,7 @@
             <p v-if="todos.length === 0">There are no to-dos. Hurray!</p>
             <ul>
                 <li v-for="(todo, index) in sortedTodos">
-                    <span :class="{ done: todo.done }">
+                    <span :class="[{ done: todo.done }, `priority-${todo.priority}`]">
                         {{ todo.text }}
                     </span>
                     <span class="due-date" v-if="todo.deadline && !todo.done">
@@ -21,10 +21,23 @@
                     <button @click="remove(index)">remove</button>
                 </li>
             </ul>
-            <input type="text" placeholder="Add new todo…" v-model="pendingTodo">
-            <label>Deadline (optional):</label>
-            <input type="text" placeholder="hh:mm dd/mm/yyyy" v-model="pendingDeadline">
-            <button @click.prevent="addTodo" :disabled="pendingTodo.trim().length === 0">Add</button>
+            <div>
+                <input type="text" placeholder="Add new todo…" v-model="pendingTodo">
+                <button @click.prevent="addTodo" :disabled="pendingTodo.trim().length === 0">Add</button>
+            </div>
+            <div>
+                <label>Deadline (optional):</label>
+                <input type="text" placeholder="hh:mm dd/mm/yyyy" v-model="pendingDeadline">
+            </div>
+            <div>
+                <label>Priority:</label>
+                <select v-model="pendingPriority">
+                    <option selected value="0">none</option>
+                    <option value="1">low</option>
+                    <option value="2">medium</option>
+                    <option value="3">high</option>
+                </select>
+            </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script src="luxon.min.js"></script>

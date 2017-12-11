@@ -1,9 +1,21 @@
-.done {
-    color: #bbb;
-    text-decoration: line-through;
-}
-
 .due-date {
     color: #aaa;
     font-style: oblique;
+}
+
+.priority-1 {
+    color: yellow;
+}
+
+.priority-2 {
+    color: orange;
+}
+
+.priority-3 {
+    color: red;
+}
+
+.done {
+    color: #bbb;
+    text-decoration: line-through;
 }
