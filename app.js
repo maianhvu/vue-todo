@@ -6,6 +6,8 @@ const SORT_DEADLINE = 'SORT_DEADLINE'
 const SORT_PRIORITY = 'SORT_PRIORITY'
 const TODOS_LOCALSTORAGE_KEY = 'vueTodoApp-todos'
 
+const API_ENDPOINT = 'https://parrotodo.herokuapp.com'
+
 const padWithZeroes = (number, length) => {
     let result = number.toString()
     if (result.length >= length) {
@@ -22,7 +24,7 @@ const padWithZeroes = (number, length) => {
 const app = new Vue({
     el: '#app',
     data: {
-        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY) || "[]").map(todo => {
+        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY)||"[]").map(todo => {
             if (todo.hasOwnProperty('deadline')) {
                 todo.deadline = DateTime.fromISO(todo.deadline)
             }
@@ -31,7 +33,11 @@ const app = new Vue({
         sortingOrder: SORT_INSERTION,
         pendingTodo: '',
         pendingDeadline: '',
-        pendingPriority: 0
+        pendingPriority: 0,
+        ifModify:0,
+        modifiedText:'',
+        modifiedDeadline:'',
+        modifiedPriority: 0
     },
     computed: {
         sortedTodos () {
@@ -68,20 +74,28 @@ const app = new Vue({
                 done: false,
                 priority: this.pendingPriority
             }
-
             if (this.pendingDeadline.trim().length &&
                 /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
-                
+
                 let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
                 let [ hour, minute ] = time.split(':').map(n => parseInt(n))
                 let [ day, month, year ] = date.split('/').map(n => parseInt(n))
-                
                 todo.deadline = DateTime.local(year, month, day, hour, minute)
             }
 
-            this.todos.push(todo)
-
+            // console.log(typeof(todo.deadline.toISO()),todo.deadline.toISO());
+            axios.post(API_ENDPOINT + `/todos`, {
+              title: this.pendingTodo,
+              deadline: todo.deadline? todo.deadline.toISO():null,
+              priority: this.pendingPriority
+            }).then(response => {
+              console.log(response.data),
+              todo.id = response.data.id
+            })
+            .catch(err =>
+                console.log(err))
             // Reset
+            this.todos.push(todo)
             this.pendingTodo = ''
             this.pendingDeadline = ''
             this.pendingPriority = 0
@@ -92,8 +106,52 @@ const app = new Vue({
         },
 
         remove (index) {
+            let id = this.todos[index].id
+            console.log(id)
             this.todos.splice(index, 1)
+            axios.delete(API_ENDPOINT + `/todos/`+id, {
+            }).then(response => 
+            console.log(response.data))
+            .catch(err=> 
+                {console.log(err)}
+                )
         },
+        // openModify(todo){
+        //   this.ifModify = todo.id;
+        //   axios.get(API_ENDPOINT + `/todos/` + todo.id, {
+        //   }).then(response => {
+        //     this.modifiedText = response.data.title;
+        //     let deadlineStr = response.data.deadline;
+        //     if(deadlineStr){
+        //       let [year,month,dayStr] = deadlineStr.split('-');
+        //       let [day,timeStr] = dayStr.split('T');
+        //       let [hour, minute, restStr] = timeStr.split(':');
+        //       this.modifiedDeadline = padWithZeroes(hour,2)+":"+padWithZeroes(minute,2)+' '+padWithZeroes(day,2)+'/'+padWithZeroes(month,2)+'/'+year;
+        //     }else{
+        //       this.modifiedDeadline = '';
+        //     }
+        //     this.pendingPriority = response.data.priority;
+        //   })
+        //   .catch(err =>{console.log(err);})
+        // },
+        // modify (todo) {
+        //     let id = todo.id;
+        //     if (this.modifiedDeadline.trim().length &&
+        //         /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
+        //         let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
+        //         let [ hour, minute ] = time.split(':').map(n => parseInt(n))
+        //         let [ day, month, year ] = date.split('/').map(n => parseInt(n))
+        //         todo.deadline = DateTime.local(year, month, day, hour, minute)
+        //     }
+        //     todo.priority = this.modifiedPriority;
+        //     todo.text = this.modifiedText;
+        //     axios.patch(API_ENDPOINT + `/todos/`+id, {
+        //       title:this.modifiedText,
+        //       deadline:todo.deadline? todo.deadline.toISO():null,
+        //       priority:this.modifiedPriority>0? this.modifiedPriority:this.pendingPriority
+        //     }).then(response => console.log(this.pendingPriority,this.modifiedPriority,response.data))
+        //     .catch(err=>console.log(err))
+        // },
 
         formatDate (date) {
             return date.toLocaleString(DateTime.DATETIME_FULL)
@@ -101,10 +159,16 @@ const app = new Vue({
 
     },
 
-    watch: {
-
-        todos (newTodos) {
-            localStorage.setItem(TODOS_LOCALSTORAGE_KEY, JSON.stringify(newTodos))
-        }
+    mounted () {
+        axios.get(API_ENDPOINT + '/todos').then(response => {
+            this.todos = response.data.map(todo => ({
+                text: todo.title,
+                priority: todo.priority,
+                deadline: todo.deadline ? DateTime.fromISO(todo.deadline) : undefined,
+                id: todo.id
+            }))
+        }).catch(err => {
+            console.error(err)
+        })
     }
 })
