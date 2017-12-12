@@ -1,0 +1,31 @@
+{
+  "name": "vue-todo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "node bin/app.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maianhvu/vue-todo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maianhvu/vue-todo/issues"
+  },
+  "homepage": "https://github.com/maianhvu/vue-todo#readme",
+  "dependencies": {
+    "webpack": "^3.10.0"
+  },
+  "devDependencies": {
+    "axios": "^0.17.1",
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0",
+    "luxon": "^0.2.7",
+    "vue": "^2.5.9"
+  }
+}
