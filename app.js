@@ -122,22 +122,23 @@ const app = new Vue({
         },
 
         edit(todo) {
-            let id = todo.id;
+            let id = todo.id
+            console.log(this.modifiedDeadline)
+
             if (this.modifiedDeadline.trim().length &&
-                /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
-                let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
+                /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.modifiedDeadline.trim())) {
+                let [ time, date ] = this.modifiedDeadline.trim().split(/\s/)
                 let [ hour, minute ] = time.split(':').map(n => parseInt(n))
                 let [ day, month, year ] = date.split('/').map(n => parseInt(n))
                 todo.deadline = DateTime.local(year, month, day, hour, minute)
             } else {
-                console.log('Something is wrong with modifiedDeadline')
+                console.log('modified deadline failed')
             }
-            todo.priority = this.modifiedPriority
-            todo.text = this.modifiedText
-            
-            axios.patch(API_ENDPOINT + '/todos/' +id, {
-                title:todo.text,
-                deadline:todo.deadline? todo.deadline.toISO():null,
+            todo.priority = this.modifiedPriority;
+            todo.text = this.modifiedText;
+            axios.patch(API_ENDPOINT + `/todos/`+id, {
+              title:this.modifiedText,
+              deadline:todo.deadline? todo.deadline.toISO():null,
                 priority:todo.priority
             }).then(response => console.log(response.data))
             .catch(err => console.log(err))
