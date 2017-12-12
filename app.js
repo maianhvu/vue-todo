@@ -70,20 +70,27 @@ const app = new Vue({
                 done: false,
                 priority: this.pendingPriority
             }
-
             if (this.pendingDeadline.trim().length &&
                 /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
 
                 let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
                 let [ hour, minute ] = time.split(':').map(n => parseInt(n))
                 let [ day, month, year ] = date.split('/').map(n => parseInt(n))
-
                 todo.deadline = DateTime.local(year, month, day, hour, minute)
             }
 
-            this.todos.push(todo)
-
+            // console.log(typeof(todo.deadline.toISO()),todo.deadline.toISO());
+            axios.post(API_ENDPOINT + `/todos`, {
+              title: this.pendingTodo,
+              deadline: todo.deadline? todo.deadline.toISO():null,
+              priority: this.pendingPriority
+            }).then(response => {
+              console.log(response.data);
+              todo.id = response.data.id;
+            })
+            .catch(err=>console.log(err))
             // Reset
+            this.todos.push(todo);
             this.pendingTodo = ''
             this.pendingDeadline = ''
             this.pendingPriority = 0
@@ -94,7 +101,12 @@ const app = new Vue({
         },
 
         remove (index) {
+            let id = this.todos[index].id;
+            console.log(id);
             this.todos.splice(index, 1)
+            axios.delete(API_ENDPOINT + `/todos/`+id, {
+            }).then(response => console.log(response.data))
+            .catch(err=>console.log(err))
         },
 
         formatDate (date) {
@@ -108,7 +120,8 @@ const app = new Vue({
             this.todos = response.data.map(todo => ({
                 text: todo.title,
                 priority: todo.priority,
-                deadline: todo.deadline ? DateTime.fromISO(todo.deadline) : undefined
+                deadline: todo.deadline ? DateTime.fromISO(todo.deadline) : undefined,
+                id: todo.id
             }))
         }).catch(err => {
             console.error(err)
