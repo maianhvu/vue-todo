@@ -118,7 +118,11 @@ const app = new Vue({
         },
 
         expandEdit(todo){
-            this.editID = todo.id
+            if (this.editID === todo.id) {
+                this.editID = 0
+            } else {
+                this.editID = todo.id
+            }
         },
 
         edit(todo) {
