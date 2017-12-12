@@ -22,7 +22,7 @@ const padWithZeroes = (number, length) => {
 const app = new Vue({
     el: '#app',
     data: {
-        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY)).map(todo => {
+        todos: JSON.parse(localStorage.getItem(TODOS_LOCALSTORAGE_KEY)||"[]").map(todo => {
             if (todo.hasOwnProperty('deadline')) {
                 todo.deadline = DateTime.fromISO(todo.deadline)
             }
@@ -71,11 +71,11 @@ const app = new Vue({
 
             if (this.pendingDeadline.trim().length &&
                 /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
-                
+
                 let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
                 let [ hour, minute ] = time.split(':').map(n => parseInt(n))
                 let [ day, month, year ] = date.split('/').map(n => parseInt(n))
-                
+
                 let dateString = year + '-' + padWithZeroes(month, 2) +
                     '-' + padWithZeroes(day, 2) + 'T' + padWithZeroes(hour, 2) + ':' +
                     padWithZeroes(minute, 2)
