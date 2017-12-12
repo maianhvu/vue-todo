@@ -33,7 +33,11 @@ const app = new Vue({
         sortingOrder: SORT_INSERTION,
         pendingTodo: '',
         pendingDeadline: '',
-        pendingPriority: 0
+        pendingPriority: 0,
+        ifModify:0,
+        modifiedText:'',
+        modifiedDeadline:'',
+        modifiedPriority: 0
     },
     computed: {
         sortedTodos () {
@@ -102,10 +106,38 @@ const app = new Vue({
 
         remove (index) {
             let id = this.todos[index].id;
-            console.log(id);
             this.todos.splice(index, 1)
             axios.delete(API_ENDPOINT + `/todos/`+id, {
             }).then(response => console.log(response.data))
+            .catch(err=> {console.log(err)})
+        },
+        openModify(todo){
+          this.ifModify = todo.id;
+          axios.get(API_ENDPOINT + `/todos/` + todo.id, {
+          }).then(response => {
+            this.modifiedText = response.data.title;
+            let deadlineStr = response.data.deadline;
+            if(deadlineStr){
+              let [year,month,dayStr] = deadlineStr.split('-');
+              let [day,timeStr] = dayStr.split('T');
+              let [hour, minute, restStr] = timeStr.split(':');
+              todo.deadline = DateTime.local(year, month, day, hour, minute);
+              this.modifiedDeadline = padWithZeroes(hour,2)+":"+padWithZeroes(minute,2)+' '+padWithZeroes(day,2)+'/'+padWithZeroes(month,2)+'/'+year;
+            }else{
+              this.modifiedDeadline = '';
+            }
+            this.pendingPriority = response.data.priority;
+            console.log(this.pendingPriority);
+          })
+          .catch(err =>{console.log(err);})
+        },
+        modify (todo) {
+            let id = todo.id;
+            axios.patch(API_ENDPOINT + `/todos/`+id, {
+              title:this.modifiedText,
+              deadline:todo.deadline? todo.deadline.toISO():null,
+              priority:this.modifiedPriority>0? this.modifiedPriority:this.pendingPriority
+            }).then(response => console.log(this.pendingPriority,this.modifiedPriority,response.data))
             .catch(err=>console.log(err))
         },
 

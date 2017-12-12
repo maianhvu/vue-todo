@@ -28,6 +28,32 @@
                     </span>
                     <button @click="markAsDone(todo)">done</button>
                     <button @click="remove(index)">remove</button>
+                    <button @click="openModify(todo)">modify</button>
+                    <div v-if="ifModify===todo.id">
+                      <div>
+                          <input type="text"  v-model="modifiedText">
+                          <button @click="modify(todo)">Modify</button>
+                      </div>
+                      <div>
+                          <label>Deadline (optional):</label>
+                          <input type="text" placeholder="hh:mm dd/mm/yyyy" v-model="modifiedDeadline">
+                      </div>
+                      <div>
+                          <label>Priority:</label>
+                          <select v-model="modifiedPriority" value="modifiedPriority">
+                              <!-- <option :selected="{active:modifiedPriority===0}" value="0">none</option>
+                              <option :selected="{active:modifiedPriority===1}" value="1">low</option>
+                              <option :selected="{active:modifiedPriority===2}" value="2">medium</option>
+                              <option :selected="{active:modifiedPriority===3}" value="3">high</option> -->
+                              <option selected value="-1">N.A.</option>
+                              <option value="0">none</option>
+                              <option value="1">low</option>
+                              <option value="2">medium</option>
+                              <option value="3">high</option>
+                          </select>
+                      </div>
+                    </div>
+
                 </li>
             </ul>
             <div>
@@ -41,7 +67,7 @@
             <div>
                 <label>Priority:</label>
                 <select v-model="pendingPriority">
-                    <option selected value="0">none</option>
+                    <option value="0">none</option>
                     <option value="1">low</option>
                     <option value="2">medium</option>
                     <option value="3">high</option>
