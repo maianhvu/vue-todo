@@ -34,7 +34,7 @@ const app = new Vue({
         pendingTodo: '',
         pendingDeadline: '',
         pendingPriority: 0,
-        ifModify:0,
+        editID:0,
         modifiedText:'',
         modifiedDeadline:'',
         modifiedPriority: 0
@@ -116,42 +116,39 @@ const app = new Vue({
                 {console.log(err)}
                 )
         },
-        // openModify(todo){
-        //   this.ifModify = todo.id;
-        //   axios.get(API_ENDPOINT + `/todos/` + todo.id, {
-        //   }).then(response => {
-        //     this.modifiedText = response.data.title;
-        //     let deadlineStr = response.data.deadline;
-        //     if(deadlineStr){
-        //       let [year,month,dayStr] = deadlineStr.split('-');
-        //       let [day,timeStr] = dayStr.split('T');
-        //       let [hour, minute, restStr] = timeStr.split(':');
-        //       this.modifiedDeadline = padWithZeroes(hour,2)+":"+padWithZeroes(minute,2)+' '+padWithZeroes(day,2)+'/'+padWithZeroes(month,2)+'/'+year;
-        //     }else{
-        //       this.modifiedDeadline = '';
-        //     }
-        //     this.pendingPriority = response.data.priority;
-        //   })
-        //   .catch(err =>{console.log(err);})
-        // },
-        // modify (todo) {
-        //     let id = todo.id;
-        //     if (this.modifiedDeadline.trim().length &&
-        //         /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
-        //         let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
-        //         let [ hour, minute ] = time.split(':').map(n => parseInt(n))
-        //         let [ day, month, year ] = date.split('/').map(n => parseInt(n))
-        //         todo.deadline = DateTime.local(year, month, day, hour, minute)
-        //     }
-        //     todo.priority = this.modifiedPriority;
-        //     todo.text = this.modifiedText;
-        //     axios.patch(API_ENDPOINT + `/todos/`+id, {
-        //       title:this.modifiedText,
-        //       deadline:todo.deadline? todo.deadline.toISO():null,
-        //       priority:this.modifiedPriority>0? this.modifiedPriority:this.pendingPriority
-        //     }).then(response => console.log(this.pendingPriority,this.modifiedPriority,response.data))
-        //     .catch(err=>console.log(err))
-        // },
+
+        expandEdit(todo){
+            this.editID = todo.id
+        },
+
+        edit(todo) {
+            let id = todo.id;
+            if (this.modifiedDeadline.trim().length &&
+                /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
+                let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
+                let [ hour, minute ] = time.split(':').map(n => parseInt(n))
+                let [ day, month, year ] = date.split('/').map(n => parseInt(n))
+                todo.deadline = DateTime.local(year, month, day, hour, minute)
+            } else {
+                console.log('Something is wrong with modifiedDeadline')
+            }
+            todo.priority = this.modifiedPriority
+            todo.text = this.modifiedText
+            
+            axios.patch(API_ENDPOINT + '/todos/' +id, {
+                title:todo.text,
+                deadline:todo.deadline? todo.deadline.toISO():null,
+                priority:todo.priority
+            }).then(response => console.log(response.data))
+            .catch(err => console.log(err))
+            //reset
+            this.modifiedText =''
+            this.modifiedDeadline=''
+            this.modifiedPriority=0
+
+
+        },
+    
 
         formatDate (date) {
             return date.toLocaleString(DateTime.DATETIME_FULL)

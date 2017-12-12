@@ -28,6 +28,25 @@
                     </span>
                     <button @click="markAsDone(todo)">done</button>
                     <button @click="remove(index)">remove</button>
+                    <button @click="expandEdit(todo)">edit</button>
+                    <div v-if="editID==todo.id">
+                        <div>
+                            <input type="text" placeholder="Edit todo" v-model="modifiedText">
+                            <input type="text" placeholder="hh:mm dd/mm/yyyy" v-model="modifiedDeadline">
+                            <button @click="edit(todo)">edit</button>
+                        </div>
+                        <div>
+                            <label>Edit priority</label>
+                            <select v-model="modifiedPriority">
+                                <option selected value="0">none</option>
+                                <option value="1">low</option>
+                                <option value="2">medium</option>
+                                <option value="3">high</option>
+                            </select>
+
+                        </div> 
+                    </div>
+
                 </li>
             </ul>
             <div>
