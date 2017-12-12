@@ -121,18 +121,25 @@ const app = new Vue({
               let [year,month,dayStr] = deadlineStr.split('-');
               let [day,timeStr] = dayStr.split('T');
               let [hour, minute, restStr] = timeStr.split(':');
-              todo.deadline = DateTime.local(year, month, day, hour, minute);
               this.modifiedDeadline = padWithZeroes(hour,2)+":"+padWithZeroes(minute,2)+' '+padWithZeroes(day,2)+'/'+padWithZeroes(month,2)+'/'+year;
             }else{
               this.modifiedDeadline = '';
             }
             this.pendingPriority = response.data.priority;
-            console.log(this.pendingPriority);
           })
           .catch(err =>{console.log(err);})
         },
         modify (todo) {
             let id = todo.id;
+            if (this.modifiedDeadline.trim().length &&
+                /^\d{1,2}:\d{2}\s\d{1,2}\/\d{1,2}\/\d{4}$/.test(this.pendingDeadline.trim())) {
+                let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
+                let [ hour, minute ] = time.split(':').map(n => parseInt(n))
+                let [ day, month, year ] = date.split('/').map(n => parseInt(n))
+                todo.deadline = DateTime.local(year, month, day, hour, minute)
+            }
+            todo.priority = this.modifiedPriority;
+            todo.text = this.modifiedText;
             axios.patch(API_ENDPOINT + `/todos/`+id, {
               title:this.modifiedText,
               deadline:todo.deadline? todo.deadline.toISO():null,
