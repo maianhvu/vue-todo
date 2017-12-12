@@ -75,15 +75,16 @@ const app = new Vue({
                 let [ time, date ] = this.pendingDeadline.trim().split(/\s/)
                 let [ hour, minute ] = time.split(':').map(n => parseInt(n))
                 let [ day, month, year ] = date.split('/').map(n => parseInt(n))
-
-                let dateString = year + '-' + padWithZeroes(month, 2) +
-                    '-' + padWithZeroes(day, 2) + 'T' + padWithZeroes(hour, 2) + ':' +
-                    padWithZeroes(minute, 2)
+                
                 todo.deadline = DateTime.local(year, month, day, hour, minute)
             }
 
             this.todos.push(todo)
+
+            // Reset
             this.pendingTodo = ''
+            this.pendingDeadline = ''
+            this.pendingPriority = 0
         },
 
         markAsDone (todo) {
